@@ -3,6 +3,8 @@ USE smartfactory;
 
 -- 문장 == Query
 
+DESC customer; -- 테이블 정보, 스키마 -> 테이블 -> 테이블명 눌러서도 확인 가능
+
 -- <SELECT/FROM>
 
 -- customer 테이블의 모든 내용 검색
@@ -153,6 +155,124 @@ SELECT * FROM customer WHERE birth >= '2000-01-01' ORDER BY custid DESC LIMIT 2;
  -- 고객 테이블 전체 정보를 조회하는데, 2번째부터 6번째 행만 조회하고 싶은 경우
 SELECT * FROM customer LIMIT 1, 5;
 SELECT * FROM customer LIMIT 5 OFFSET 1; 
+
+-- <IS NULL>
+-- 고객 테이블에서 연락처가 존재하지 않는 고객 조회
+SELECT * FROM customer WHERE phone IS NULL;
+
+-- 고객 테이블에서 연락처와 생일이 존재하지 않는 고객 조회 
+SELECT * FROM customer WHERE phone IS NULL AND birth IS NULL;
+
+-- 고객 테이블에서 연락처가 존재하는 고객 조회
+SELECT * FROM customer WHERE phone IS NOT NULL;
+
+-- <집계 함수>
+-- SUM, AVG, MIN, MAX, COUNT
+-- 주문 테이블에서 총 주문 내역 건수 조회 (== 투플 개수)
+-- COUNT(*): 모든 행의 개수를 카운트
+-- COUNT(속성이름): 속성 값이 NULL인 것을 제외하고 카운트
+/*
+count(*)와 count(1) 의 차이
+요약 두 명령문 모두 동일한 방식으로 작동
+성능상 차이는 거의 없음
+개발자 개인의 스타일
+가독성을 위해 1보다는 * 사용을 권장
+*/
+
+SELECT COUNT(*) FROM orders;
+SELECT COUNT(orderid) FROM orders;
+
+SELECT COUNT(*) FROM customer; -- 11 
+SELECT COUNT(custname) FROM customer; -- 11 
+SELECT COUNT(phone) FROM customer; -- 10 
+SELECT COUNT(birth) FROM customer; -- 9 
+
+SELECT * FROM orders;
+
+-- 주문 테이블에서 총 판매 개수 검색 
+SELECT SUM(amount) FROM orders;
+
+-- 주문 테이블에서 총 판매 개수 검색 + 의미 있는 열 이름으로 변경
+SELECT SUM(amount) AS 'total_amount' FROM orders; -- 속성 이름 변경
+SELECT SUM(amount) AS total_amount FROM orders; -- 동일 표현
+SELECT SUM(amount) total_amount FROM orders; -- 동일 표현
+
+-- 주문 테이블에서 총 판매 개수, 평균 판매 개수, 상품 최저가, 상품 최고가 검색
+-- 총 판매 개수: SUM()
+-- 평균 판매 개수: AVG()
+-- 상품 최저가: MIN()
+-- 상품 최고가: MAX()
+SELECT SUM(amount) AS 'total_amount', 
+	AVG(amount) AS 'avg_amount', 
+    MIN(price) AS 'min_price', 
+    MAX(price) AS 'max_price' 
+FROM orders;
+
+-- <GROUP BY>
+-- 고객 별로 주문한 주문 내역 건수 구하기
+SELECT custid, count(*) FROM orders GROUP BY custid;
+SELECT custid FROM orders GROUP BY custid ORDER BY custid DESC;
+
+-- 고객별로 주문한 상품 총 수량 구하기
+SELECT custid AS '아이디', SUM(amount) AS 'total_amount' FROM orders GROUP BY custid;
+
+-- 고객별로 주문한 총 주문액 구하기
+SELECT custid AS '아이디', SUM(price * amount) AS '총 주문액' FROM orders GROUP BY custid;
+
+-- 상품별로 판매 개수 구하기
+SELECT prodname AS '상품명', SUM(amount) AS '판매 개수' FROM orders GROUP BY prodname;
+
+-- 상품별로 판매 개수 구하기 + 판매 개수 기준으로 내림차순 정렬
+SELECT prodname AS '상품명', SUM(amount) AS '판매 개수' FROM orders GROUP BY prodname ORDER BY SUM(amount) DESC;
+SELECT prodname AS '상품명', SUM(amount) AS 'total_amount' FROM orders GROUP BY prodname ORDER BY total_amount DESC; -- 이렇게 표현할 때는 한글 X
+
+-- 짝수 해에 태어난 고객 조회
+SELECT * FROM customer WHERE YEAR(birth) % 2 = 0;
+
+-- 홀수 일에 태어난 고객 조회
+SELECT * FROM customer WHERE MOD(DAY(birth), 2) = 1;
+
+-- 홀수 달에 태어난 고객 조회
+SELECT * FROM customer WHERE MONTH(birth) % 2 = 1;
+
+-- 2000-02-22 다음날에 태어난 고객 조회 
+-- DATE('2000-02-22'): '2000-02-22' 문자 데이터를 날짜 데이터로 변환
+SELECT * FROM customer WHERE birth = DATE('2000-02-22') + 1;
+
+SELECT * FROM orders;
+SELECT * FROM customer;
+
+-- <HAVING>
+-- group by 명령 이후 추가 조건
+
+-- 총 주문액이 10000원 이상인 고객에 대해 고객별로 주문한 상품 총수량 구하기 
+-- = 고객별로 주문한 상품 총수량 구하기. 단, 총 주문액이 10000원 이상인 고객만 구한다. 
+SELECT custid AS '아이디', SUM(amount) AS '주문 수량', SUM(price * amount) AS '총 주문금액' 
+FROM orders 
+GROUP BY custid
+HAVING SUM(price * amount) >= 10000;
+
+-- HAVING 절은 GROUP BY 절과 반드시 함꼐 사용
+-- HAVING 절은 WHERE 절보다 뒤에 나와야 함. 
+
+-- 총 주문액이 10000원 이상인 고객에 대해 고객별로 주문한 상품 총 수량 구하기 (단, custid가 'bunny'인 경우 제외)
+SELECT custid AS '아이디', SUM(amount) AS '주문 수량', SUM(price * amount) AS '총 주문금액' 
+	FROM orders 
+	WHERE custid != 'bunny'
+	GROUP BY custid
+	HAVING SUM(price * amount) >= 10000;
+
+SELECT custid AS '아이디', SUM(amount) AS '주문 수량', SUM(price * amount) AS '총 주문금액' 
+	FROM orders 
+	GROUP BY custid
+	HAVING SUM(price * amount) >= 10000 AND custid != 'bunny'; -- WHERE을 쓰지 않을 때
+
+
+
+
+
+
+
 
 /*
 SQL 내부 실행 순서
