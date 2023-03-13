@@ -4,6 +4,9 @@ USE new_smartfactory;
 -- <CREATE>
 -- 데이터베이스 생성 + 한글 인코딩 
 -- 한글 인코딩: 프로그래밍 언어는 영어 기반이므로 한글을 사용할 수 있도록! 
+-- 테이블 생성시 속성의 순서는 상관 없음. 
+-- 왜냐하면 릴레이션 특징 중에서 "속성의 순서는 상관 없음"이 존재. 
+-- 테이블 생성시 열 이름 > 데이터 형식 순으로 작성은 해야함. 
 
 CREATE DATABASE new_smartfactory DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 CREATE DATABASE new_smartfactory DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
@@ -21,7 +24,7 @@ CREATE DATABASE new_smartfactory CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unico
 -- 기본키는 중복 불가능 
 -- NULL 불가능
 CREATE TABLE new_customer 
-(
+(	-- 열(데이터) 이름, 데이터 형식(타입), 제약 조건 순서로 작성
 	custid CHAR(10) NOT NULL PRIMARY KEY, -- PRIMARY KEY는 NOT NULL을 포함하고 있기 때문에 NOT NULL 생략 가능
     custname VARCHAR(10)  NOT NULL,
     addr CHAR(10) NOT NULL,
@@ -96,48 +99,4 @@ ALTER TABLE new_customer DROP n_name;
 DROP TABLE new_customer;
 DROP TABLE new_orders;
 
--- 실습
 
-CREATE TABLE new_user
-(
-	id VARCHAR(10) PRIMARY KEY, 
-	pw VARCHAR(20) NOT NULL,
-	name CHAR(5) NOT NULL,
-	gender CHAR(1),
-	birthday DATE NOT NULL,
-    age INT NOT NULL
-);
-DESC new_user;
-SELECT * FROM new_user;
-
-DROP TABLE new_user;
-
-CREATE TABLE member
-(
-	id VARCHAR(20) PRIMARY KEY, 
-	name VARCHAR(5) NOT NULL,
-    age INT,
-	gender VARCHAR(2) NOT NULL,
-	email VARCHAR(50),
-    promotion VARCHAR(2) DEFAULT "x"
-);
-DESC member;
-SELECT * FROM member;
-
-
-
--- member 속성 수정 
-
--- (1) id 값 형식 변경 
-ALTER TABLE member MODIFY id VARCHAR(10);
-ALTER TABLE member CHANGE id id VARCHAR(10);
-
--- (2) age 속성 삭제 
-ALTER TABLE member DROP age;
-
--- (3) interest 속성 추가
-ALTER TABLE member ADD interest VARCHAR(100); 
-
-DESC member;
-
-DROP TABLE member;

@@ -31,7 +31,6 @@ DESC member;
 SELECT * FROM member;
 
 
-
 -- member 속성 수정 
 
 -- (1) id 값 형식 변경 
@@ -45,7 +44,6 @@ ALTER TABLE member DROP age;
 
 -- (3) interest 속성 추가
 ALTER TABLE member ADD interest VARCHAR(100); 
-
 DESC member;
 
 DROP TABLE member;
