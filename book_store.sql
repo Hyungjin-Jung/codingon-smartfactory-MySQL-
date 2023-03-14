@@ -120,3 +120,61 @@ SELECT * FROM authors;
 DROP TABLE authors;
 DROP TABLE books;
 DROP TABLE orders;
+
+-- ------------------------------------------------------------------------------
+-- < 추가 실습 >
+-- 11. Stephen King이 쓴 모든 책의 제목과 발행일을 표시합니다.
+-- JOIN문 사용
+SELECT title, publication_date
+    FROM books INNER JOIN authors
+    ON books.author_id = authors.author_id
+    WHERE first_name = 'Stephen' AND last_name = 'King';
+
+-- 서브쿼리문 사용
+SELECT title, publication_date FROM books
+    WHERE author_id = (SELECT author_id FROM authors WHERE first_name = 'Stephen' AND last_name = 'King');
+
+-- 12. 책을 쓴 저자의 이름을 표시합니다.
+-- 서브쿼리문 사용
+SELECT first_name, last_name FROM authors 
+	WHERE author_id IN (SELECT author_id FROM books);	-- books 안에 author_id가 있다면
+
+-- JOIN문 사용
+SELECT first_name, last_name 
+	FROM authors JOIN books 
+    ON books.author_id = authors.author_id
+    GROUP BY authors.author_id;
+
+-- 13. 각 저자가 쓴 책의 수를 표시합니다.
+SELECT first_name, last_name, COUNT(books.author_id) AS 'num_books' 
+	FROM authors INNER JOIN books 
+    ON books.author_id = authors.author_id
+    GROUP BY authors.author_id;
+    
+-- 선생님 풀이 
+SELECT a.first_name, a.last_name, COUNT(b.book_id) AS 'num_books'
+FROM authors AS a JOIN books AS b	-- authors를 a로, books를 b로 변경 -> a와 b로 단축 시켰음.
+ON a.author_id = b.author_id
+GROUP BY a.author_id;
+
+SELECT a.first_name, a.last_name, COUNT(b.book_id) AS 'num_books'
+FROM authors AS a, books AS b
+WHERE a.author_id = b.author_id
+GROUP BY a.author_id;
+
+-- 14. 2022년 2월 16일 이후에 발생한 모든 주문에 대한 책 제목과 고객 이름을 표시합니다.
+SELECT title, customer_name 
+	FROM books INNER JOIN orders 
+    ON books.book_id = orders.book_id
+    WHERE order_date >= '2022-02-16';
+
+SELECT books.title, orders.customer_name
+FROM books, orders
+WHERE books.book_id = orders.book_id AND orders.order_date >= '2022-02-16';
+
+SELECT * FROM authors;
+SELECT * FROM books;
+SELECT * FROM orders;
+
+
+
