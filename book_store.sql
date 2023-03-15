@@ -50,7 +50,8 @@ SELECT * FROM authors;
 INSERT INTO books VALUES 
 	('1', 'Harry Potter and the Philosopher''s Stone', '1', '1997-06-26'),
 	('2', 'A Game of Thrones', '2', '1996-08-006'),
-    ('3', 'The Shining', '3', '1977-01-28');
+    ('3', 'The Shining', '3', '1977-01-28'),
+    ('4', 'HELLO WORLD', '3', '2023-03-14');
 DESC books;
 SELECT * FROM books;
 
@@ -171,6 +172,36 @@ SELECT title, customer_name
 SELECT books.title, orders.customer_name
 FROM books, orders
 WHERE books.book_id = orders.book_id AND orders.order_date >= '2022-02-16';
+
+-- <LEFT OUTER JOIN, LEFT JOIN>
+-- : 첫번째 테이블을 기준으로 두번째 테이블을 조합하는 JOIN 
+-- 테이블 A LEFT JOIN 테이블 B ON 조인조건
+-- LEFT(왼쪽) 테이블의 것은 모두 출력이 됨!!
+-- 조인 순서가 중요!! 
+-- ON 조건을 불만족시: 테이블A 속성 값은 그대로 가져오고, 테이블B 속성 값은 NULL
+
+-- books 테이블에 데이터 추가 
+-- 책아이디: 5
+-- 제목: Lucky Day
+-- 작가아이디: NULL
+-- 출판일자: 2023-03-01
+
+INSERT INTO books VALUES ('5', 'Lucky Day', NULL, '2023-03-01');
+
+-- INNER JOIN (books, authors)
+-- books 테이블에 author_id가 NULL이었던 행은 제외하고 출력 
+SELECT * FROM books INNER JOIN authors ON books.author_id = authors.author_id;
+
+-- LEFT JOIN (books, authors)
+-- books 테이블에 author_id가 NULL인 행이 있더라도 출력
+SELECT * FROM books LEFT JOIN authors ON books.author_id = authors.author_id;
+-- LEFT JOIN 에는 순서가 존재함을 보여주는 예시 
+SELECT * FROM authors LEFT JOIN books ON books.author_id = authors.author_id;
+
+-- RIGHT JOIN
+SELECT * FROM authors RIGHT JOIN books ON books.author_id = authors.author_id;
+
+
 
 SELECT * FROM authors;
 SELECT * FROM books;
