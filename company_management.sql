@@ -179,20 +179,34 @@ SELECT * FROM departments;
 -- 9. 관리자와 동일한 직함을 가진 모든 직원의 이름을 반환하는 쿼리를 작성합니다.
 -- 직원(employee_id)과 상사/관리자(manager_id)의 job_id가 일치하는 sql문을 작성해라.
 
-SELECT first_name, last_name FROM employees INNER JOIN jobs 
-	ON employees.job_id = jobs.job_id
-    WHERE jobs.job_id = employees.manager_id;
+SELECT a.first_name, a.last_name 
+	FROM employees AS a INNER JOIN employees AS b
+	ON a.job_id = b.job_id
+    WHERE a.manager_id = b.employee_id;    
 
-
+SELECT * FROM employees;
+SELECT * FROM jobs;
+SELECT * FROM departments;
 
 -- 10. 2021년에 채용된 모든 직원의 이름을 반환하는 쿼리를 작성합니다.
-​
-​
-​
+
+SELECT first_name, last_name FROM employees WHERE hire_date LIKE '2021%';
+
+SELECT * FROM employees;
+SELECT * FROM jobs;
+SELECT * FROM departments;
+
 -- 11. 수수료를 받는 모든 직원의 이름과 급여를 반환하는 쿼리를 작성합니다.
-​
-​
-​
+
+SELECT first_name, last_name, salary FROM employees WHERE commission_pct != 'NULL';
+SELECT first_name, last_name, salary FROM employees WHERE commission_pct IS NOT NULL;
+
+SELECT * FROM employees;
+SELECT * FROM jobs;
+SELECT * FROM departments;
+
 -- 12. 수수료를 받지 않는 모든 직원의 이름과 급여를 반환하는 쿼리를 작성합니다.
 
+SELECT first_name, last_name, salary FROM employees WHERE commission_pct IS NULL;
+-- SELECT first_name, last_name, salary FROM employees WHERE commission_pct = 'NULL'; -- 실행 X
 
