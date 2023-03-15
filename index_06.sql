@@ -59,6 +59,7 @@ REVOKE DELETE ON *.* FROM 'codee'@'localhost';
 REVOKE ALL ON *.* FROM 'codee'@'localhost';		-- 빨간 밑줄이 그어지지만 정상 동작
 
 -- 계정 삭제 
+-- DELETE를 사용해도 되지만, DROP을 권장!!
 DROP USER 'codee'@'localhost';
 DROP USER 'lucky'@'localhost';
 DROP USER 'happy'@'localhost';
