@@ -15,6 +15,7 @@ CREATE USER 'lucky'@'localhost' IDENTIFIED BY 'jin805703';	-- 권한 부여 X
 CREATE USER 'happy'@'localhost' IDENTIFIED BY 'jin805703';	-- new_smartfactoy 스키마에 SELECT 권한 부여
 
 -- 참고) MySQL 사용자 비밀번호를 변경하고 싶다면? 
+-- ALTER USER '계정명'@'접속경로' IDENTIFIED WITH mysql_native_password BY '비밀번호';
 ALTER USER 'codee'@'localhost' IDENTIFIED WITH mysql_native_password BY 'jin805703';
 FLUSH PRIVIlEGES;	-- 새로 고침해야 반영!
 
@@ -28,7 +29,7 @@ SELECT user FROM mysql.USER;	-- mysql.user: mysql db의 user table
 -- 모든 데이터베이스의 모든 테이블: *.*
 -- 모든 권한 부여: GRANT ALL PRIVILEGES
 -- WITH GRANT OPTION: 권한을 다른 사용자한테 부여 가능할 수 있는 옵션
-	-- roor -> codee -> ?
+	-- root -> codee -> ?
 
 -- Ex. codee 사용자에게 모든 데이터베이스의 모든 테이블에 모든 권한 부여
 GRANT ALL PRIVILEGES ON *.* TO 'codee'@'localhost' WITH GRANT OPTION;
@@ -64,3 +65,24 @@ DROP USER 'codee'@'localhost';
 DROP USER 'lucky'@'localhost';
 DROP USER 'happy'@'localhost';
 FLUSH PRIVIlEGES;	-- 새로 고침해야 반영!
+
+
+-- 셀프 조인 
+CREATE TABLE users (
+	id INT PRIMARY KEY, -- 유저번호
+    name VARCHAR(10), -- 유저명
+    superior_id INT -- 상사
+);
+
+INSERT INTO users VALUES 
+	(1, 'happy', NULL), 
+    (2, 'banana', 1), 
+    (3, 'lucky', 2),
+    (4, 'orange', 2), 
+    (5, 'apple', NULL);
+
+SELECT * FROM users;
+
+SELECT * FROM users AS u1 JOIN users AS u2 ON u1.superior_id = u2.id;
+
+SELECT u1.id, u1.name AS '멘티명', u2.name AS '멘토명' FROM users AS u1 JOIN users AS u2 ON u1.superior_id = u2.id;

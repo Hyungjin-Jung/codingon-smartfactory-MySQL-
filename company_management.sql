@@ -82,7 +82,7 @@ SELECT * FROM employees WHERE department_id = 5;
 
 SELECT * FROM employees INNER JOIN departments 
 	ON employees.department_id = departments.department_id
-    WHERE departments.department_id = 5;
+    WHERE departments.department_name = 'IT';
 
 SELECT * FROM employees;
 SELECT * FROM jobs;
@@ -90,10 +90,10 @@ SELECT * FROM departments;
 
 -- 2. 각 부서의 총 직원 수를 반환하는 쿼리를 작성합니다.
 
-SELECT department_name, COuNT(employees.department_id) AS '직원 수' 
+SELECT department_name, COuNT(departments.department_name) AS '직원 수' 
 	FROM employees INNER JOIN departments 
 	ON employees.department_id = departments.department_id
-    GROUP BY departments.department_id;
+    GROUP BY departments.department_name;
     
 SELECT department_id, COuNT(department_id) AS '직원 수' 
 	FROM employees 
@@ -105,9 +105,9 @@ SELECT * FROM departments;
 
 -- 3. $80,000 이상의 급여를 받는 모든 직원의 이름을 반환하는 쿼리를 작성합니다.
 
-SELECT first_name, last_name FROM employees WHERE salary >= 80000;
+SELECT first_name, last_name, salary FROM employees WHERE salary >= 80000;
 
-SELECT first_name, last_name 
+SELECT first_name, last_name, salary 
 	FROM employees INNER JOIN jobs 
 	ON employees.job_id = jobs.job_id
     WHERE salary >= 80000;
@@ -119,17 +119,26 @@ SELECT * FROM departments;
 -- 4. 영업부에서 근무하며 $50,000 이상의 급여를 받는 모든 직원의 이름과 급여를 반환하는 쿼리를 작성합니다.
 
 SELECT first_name, last_name, salary
+	FROM employees 
+    WHERE salary >= 50000 AND department_id = 2;
+
+SELECT first_name, last_name, salary
+	FROM employees INNER JOIN departments 
+	ON employees.department_id = departments.department_id
+    WHERE salary >= 50000 AND department_name ='Sales';
+/*
+SELECT first_name, last_name, salary
 	FROM employees INNER JOIN jobs 
 	ON employees.job_id = jobs.job_id
-    WHERE salary >= 50000 AND jobs.job_id = 5;
-
+    WHERE salary >= 50000 AND job_title ='Salesperson';
+*/
 SELECT * FROM employees;
 SELECT * FROM jobs;
 SELECT * FROM departments;
 
 -- 5. 직함과 직함별 평균 급여를 반환하는 조회를 작성합니다.
 
-SELECT job_id, AVG(employees.salary) AS '평균 급여'
+SELECT job_id, AVG(salary) AS '평균 급여'
 	FROM employees
     GROUP BY job_id;
 
@@ -142,17 +151,22 @@ SELECT * FROM employees;
 SELECT * FROM jobs;
 SELECT * FROM departments;
 
--- 6. 모든 작업에 대한 직책과 최대 급여를 반환하는 조회를 작성합니다.
+-- 6. 모든 직업에 대한 직책과 최대 급여를 반환하는 조회를 작성합니다.
 
+SELECT job_title, MAX(max_salary) FROM jobs GROUP BY job_title;
+
+SELECT job_id, MAX(max_salary) FROM jobs GROUP BY job_id;
+
+-- 부서 중에서 
+/*
 SELECT departments.department_name, MAX(salary) AS '최대 급여'
 	FROM departments INNER JOIN employees 
-	ON employees.job_id = departments.department_id
+	ON employees.department_id = departments.department_id
     GROUP BY departments.department_name;
-
+*/
 SELECT * FROM employees;
 SELECT * FROM jobs;
 SELECT * FROM departments;
-
 
 -- 7. 가장 높은 연봉을 받는 직원 상위 10명의 이름과 급여를 반환하는 쿼리를 작성합니다.
 
@@ -179,10 +193,15 @@ SELECT * FROM departments;
 -- 9. 관리자와 동일한 직함을 가진 모든 직원의 이름을 반환하는 쿼리를 작성합니다.
 -- 직원(employee_id)과 상사/관리자(manager_id)의 job_id가 일치하는 sql문을 작성해라.
 
-SELECT a.first_name, a.last_name 
-	FROM employees AS a INNER JOIN employees AS b
-	ON a.job_id = b.job_id
-    WHERE a.manager_id = b.employee_id;    
+SELECT e.first_name, e.last_name
+	FROM employees AS e JOIN employees AS m
+	ON e.manager_id = m.employee_id
+	WHERE e.job_id = m.job_id;
+
+SELECT e.first_name, e.last_name
+	FROM employees AS e JOIN employees AS m
+	ON e.job_id = m.job_id
+	WHERE e.manager_id = m.employee_id;
 
 SELECT * FROM employees;
 SELECT * FROM jobs;
@@ -190,7 +209,12 @@ SELECT * FROM departments;
 
 -- 10. 2021년에 채용된 모든 직원의 이름을 반환하는 쿼리를 작성합니다.
 
-SELECT first_name, last_name FROM employees WHERE hire_date LIKE '2021%';
+SELECT first_name, last_name, hire_date FROM employees WHERE hire_date LIKE '2021%';
+
+SELECT first_name, last_name, hire_date FROM employees WHERE hire_date BETWEEN '2021-01-01' AND '2021-12-31';
+
+SELECT first_name, last_name, hire_date FROM employees WHERE YEAR(hire_date) = 2021;
+
 
 SELECT * FROM employees;
 SELECT * FROM jobs;
@@ -198,8 +222,8 @@ SELECT * FROM departments;
 
 -- 11. 수수료를 받는 모든 직원의 이름과 급여를 반환하는 쿼리를 작성합니다.
 
-SELECT first_name, last_name, salary FROM employees WHERE commission_pct != 'NULL';
-SELECT first_name, last_name, salary FROM employees WHERE commission_pct IS NOT NULL;
+SELECT first_name, last_name, salary, commission_pct FROM employees WHERE commission_pct IS NOT NULL;
+-- SELECT first_name, last_name, salary, commission_pct FROM employees WHERE commission_pct != 'NULL';	-- 자동 형변환이 되어서 우연히 된 것. 즉, 문법에 어긋 남
 
 SELECT * FROM employees;
 SELECT * FROM jobs;
@@ -207,6 +231,8 @@ SELECT * FROM departments;
 
 -- 12. 수수료를 받지 않는 모든 직원의 이름과 급여를 반환하는 쿼리를 작성합니다.
 
-SELECT first_name, last_name, salary FROM employees WHERE commission_pct IS NULL;
--- SELECT first_name, last_name, salary FROM employees WHERE commission_pct = 'NULL'; -- 실행 X
+SELECT first_name, last_name, salary, commission_pct FROM employees WHERE commission_pct IS NULL;
+-- SELECT first_name, last_name, salary, commission_pct FROM employees WHERE commission_pct = 'NULL'; -- 실행 X, 문법 X
+
+
 
