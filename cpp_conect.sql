@@ -10,3 +10,4 @@ SELECT user FROM mysql.user;
 USE cpp_db;
 SHOW TABLES;
 SELECT * FROM inventory;
+SELECT * FROM departments;
